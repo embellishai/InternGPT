@@ -23,8 +23,6 @@ import gradio as gr
 import gradio.themes.base as ThemeBase
 from gradio.themes.utils import colors, fonts, sizes
 
-from openai.error import APIConnectionError
-
 # from iGPT.models import *
 
 from iGPT.controllers import ConversationBot
@@ -161,8 +159,24 @@ def login_with_key(bot, debug, api_key):
             openai.api_key = api_key
             try:
                 llm = OpenAI(temperature=0)
-                llm('Hi!')
-                response = 'Success!'
+                response = openai.ChatCompletion.create(
+                    model="gpt-3.5-turbo",
+                    messages=[
+                        {"role": "system", "content": "You are a helpful assistant."},
+                        {"role": "user", "content": "Hi!"}
+                    ],
+                    temperature=0
+                )
+                #response = openai.Completion.create(
+                #    engine="text-davinci-003",  # Choose the appropriate model
+                #    prompt="Hi!",
+                #    max_tokens=5,
+                #    temperature=0
+                #)
+                response_text = response.choices[0].message['content'].strip()
+                #response = response.choices[0].text.strip()
+                print(response_text)
+                #llm('Hi!')
                 is_error = False
                 user_state = bot.init_agent()
             except Exception as err:
@@ -170,6 +184,9 @@ def login_with_key(bot, debug, api_key):
                 print(err)
                 response = 'Incorrect key, please input again'
                 is_error = True
+            
+            
+
         else:
             is_error = True
             response = 'Incorrect key, please input again'
