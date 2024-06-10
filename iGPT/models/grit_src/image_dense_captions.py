@@ -16,7 +16,6 @@ from ..grit_src.grit.config import add_grit_config
 
 from ..grit_src.grit.predictor import VisualizationDemo
 
-
 # constants
 WINDOW_NAME = "GRiT"
 

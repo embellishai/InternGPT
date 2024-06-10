@@ -15,7 +15,7 @@ from .grit_model import DenseCaptioning
 from .lang import SimpleLanguageModel
 from scipy.io.wavfile import write as write_wav
 from bark import SAMPLE_RATE, generate_audio
-
+import wget
 
 class VideoCaption:
     def __init__(self, device,e_mode):
@@ -26,6 +26,8 @@ class VideoCaption:
         self.video_path = None
         self.result = None
         self.tags = None
+        self.model_checkpoint_path = "model_zoo/tag2text_swin_14m.pth"
+        self.download_parameters()
         self.normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                         std=[0.229, 0.224, 0.225])
         self.transform = transforms.Compose([transforms.ToPILImage(),transforms.Resize((self.image_size,  self.image_size)), transforms.ToTensor(),self.normalize])
@@ -35,6 +37,11 @@ class VideoCaption:
             self.model.to(device)
         self.load_video = LoadVideo()
         print("[INFO] initialize Caption model success!")
+    
+    def download_parameters(self):
+        url = "https://huggingface.co/spaces/xinyu1205/recognize-anything/resolve/main/tag2text_swin_14m.pth?download=true"
+        if not os.path.exists(self.model_checkpoint_path):
+            wget.download(url, out=self.model_checkpoint_path)
 
     def framewise_details(self, inputs):
         video_path = inputs.strip()
